@@ -2,7 +2,7 @@
 
 ## Project Proposal
 
-![project-goal](project-goal.pmg)
+![project-goal](project-goal.png)
 
 ## Description and Modules
 
