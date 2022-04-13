@@ -1,5 +1,6 @@
 package com.github.devwdougherty.demos.kafka.opensearch;
 
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -11,6 +12,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.RequestOptions;
@@ -77,6 +80,17 @@ public class OpenSearchConsumer {
         return new KafkaConsumer<>(properties);
     }
 
+    private static String extractId(String json) {
+
+        // Gson Library
+        return JsonParser.parseString(json)
+                .getAsJsonObject()
+                .get("meta")
+                .getAsJsonObject()
+                .get("id")
+                .getAsString();
+    }
+
     public static void main(String[] args) throws IOException {
 
         // First create an OpenSearch client
@@ -108,15 +122,40 @@ public class OpenSearchConsumer {
                 int recordsCount = records.count();
                 log.info("Received {} record(s)", recordsCount);
 
+                BulkRequest bulkRequest = new BulkRequest();
+
                 for(ConsumerRecord<String, String> record: records) {
 
-                    // Send the record into OpenSearch
-                    IndexRequest indexRequest = new IndexRequest("wikimedia")
-                            .source(record.value(), XContentType.JSON);
+                    try {
+                        // Strategy 1 -  Define an ID using Kafka Record coordinates
+                        //String id = record.topic() + "_" + record.partition() + "_" + record.offset();
 
-                    IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+                        // Strategy 2 - We extract the ID from JSON Value using GSON Library
+                        String id = extractId(record.value());
 
-                    log.info(response.getId());
+                        // Send the record into OpenSearch
+                        IndexRequest indexRequest = new IndexRequest("wikimedia")
+                                .source(record.value(), XContentType.JSON)
+                                .id(id);
+
+                        //IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+                        //log.info(response.getId());
+
+                        bulkRequest.add(indexRequest);
+                    } catch(Exception e) {
+
+                    }
+                }
+
+                if(bulkRequest.numberOfActions() > 0) {
+                    BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    log.info("Inserted {} record(s)", bulkResponse.getItems().length);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e) {
