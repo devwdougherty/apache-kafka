@@ -18,6 +18,7 @@ public class ConsumerDemo {
 
     public static void main(String[] args) {
 
+        System.out.println("Hello Kafka World!");
         System.out.println("I'm a Kafka Consumer!");
 
         String bootStrapServer = "127.0.0.1:9092";
@@ -32,7 +33,7 @@ public class ConsumerDemo {
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); //none/earliest/latest
 
         // Create consumer
-        KafkaConsumer<String, String> consumer=  new KafkaConsumer<>(properties);
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
 
         // Subscribe consumer to our topic(s)
         consumer.subscribe(Collections.singletonList(topic));
@@ -40,7 +41,7 @@ public class ConsumerDemo {
         // Pool for new data
         while(true) {
 
-            log.info("Polling");
+            log.info("Polling...");
 
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 

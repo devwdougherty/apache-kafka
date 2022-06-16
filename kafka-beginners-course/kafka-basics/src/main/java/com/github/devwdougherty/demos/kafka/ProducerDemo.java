@@ -14,7 +14,8 @@ public class ProducerDemo {
     public static final Logger log = LoggerFactory.getLogger(ProducerDemo.class);
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+
+        System.out.println("Hello Kafka World!");
 
         // Create Producer Properties
         Properties properties = new Properties();
@@ -23,7 +24,7 @@ public class ProducerDemo {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         // Create the Producer
-        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
+        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
         // Create a Producer Record
         ProducerRecord<String, String> producerRecord = new ProducerRecord<>("demo_java", "hello world");

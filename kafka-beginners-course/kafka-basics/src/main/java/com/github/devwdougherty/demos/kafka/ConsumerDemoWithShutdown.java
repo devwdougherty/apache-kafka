@@ -19,7 +19,7 @@ public class ConsumerDemoWithShutdown {
 
     public static void main(String[] args) {
 
-        System.out.println("I'm a Kafka Consumer!");
+        log.info("I'm a Kafka Consumer!");
 
         String bootStrapServer = "127.0.0.1:9092";
         String groupId = "my-third-application";
@@ -58,14 +58,14 @@ public class ConsumerDemoWithShutdown {
             consumer.subscribe(Collections.singletonList(topic));
 
             // Pool for new data
-            while (true) {
+            while(true) {
 
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
                 for (ConsumerRecord<String, String> record : records) {
 
-                    log.info("Key: " + record.key() + ", Value: " + record.value());
-                    log.info("Partition: " + record.partition() + ", Offset: " + record.offset());
+                    log.info("Key: {}, Value: {}", record.key(), record.value());
+                    log.info("Partition: {}, Offset: {}", record.partition(), record.offset());
                 }
             }
         } catch (WakeupException e) {

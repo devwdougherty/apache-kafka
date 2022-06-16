@@ -12,7 +12,8 @@ public class ProducerDemoWithCallback {
     public static final Logger log = LoggerFactory.getLogger(ProducerDemoWithCallback.class);
 
     public static void main(String[] args) {
-        System.out.println("I am a Kafka producer!");
+
+        log.info("I am a Kafka producer!");
 
         // Create Producer Properties
         Properties properties = new Properties();
@@ -36,19 +37,20 @@ public class ProducerDemoWithCallback {
 
                     // Executes every time a record is successfully sent or an exception is thrown
                     if(exception == null) {
+
                         // The record was successfully sent
-                        log.info("Received new metadata: \n " +
-                                "Topic: " + metadata.topic() + "\n" +
-                                "Partition: " + metadata.partition() + "\n" +
-                                "Offset: " + metadata.offset() + "\n" +
-                                "Timestamp: " + metadata.timestamp() + "\n");
+                        log.info("Received new metadata: \nTopic: {} \nPartition: {} \nOffset: {} \nTimestamp: {}\n",
+                                metadata.topic(),
+                                metadata.partition(),
+                                metadata.offset(),
+                                metadata.timestamp());
                     } else {
                         log.error("Error while producing: ", exception);
                     }
                 }
             });
 
-            // With Thread sleep we can force kafka to split in batches and send to different permissions.
+            // With Thread sleep we can force kafka to split in batches and send to different permissions (?).
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

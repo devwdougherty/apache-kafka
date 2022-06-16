@@ -12,7 +12,8 @@ public class ProducerDemoKeys {
     public static final Logger log = LoggerFactory.getLogger(ProducerDemoKeys.class);
 
     public static void main(String[] args) {
-        System.out.println("I am a Kafka producer!");
+
+        log.info("I am a Kafka producer!");
 
         // Create Producer Properties
         Properties properties = new Properties();
@@ -40,13 +41,14 @@ public class ProducerDemoKeys {
 
                     // Executes every time a record is successfully sent or an exception is thrown
                     if(exception == null) {
+
                         // The record was successfully sent
-                        log.info("Received new metadata: \n " +
-                                "Topic: " + metadata.topic() + "\n" +
-                                "Key: " + producerRecord.key() + "\n" +
-                                "Partition: " + metadata.partition() + "\n" +
-                                "Offset: " + metadata.offset() + "\n" +
-                                "Timestamp: " + metadata.timestamp() + "\n");
+                        log.info("Received new metadata: \nTopic: {} \nKey: {} \nPartition: {} \nOffset: {} \nTimestamp: {}\n",
+                                metadata.topic(),
+                                producerRecord.key(),
+                                metadata.partition(),
+                                metadata.offset(),
+                                metadata.timestamp());
                     } else {
                         log.error("Error while producing: ", exception);
                     }
