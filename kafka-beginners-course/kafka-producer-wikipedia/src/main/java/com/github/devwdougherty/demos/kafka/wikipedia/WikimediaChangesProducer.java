@@ -22,11 +22,17 @@ public class WikimediaChangesProducer {
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        // For safe producer configs (Kafka <= 2.8) we need to set: ENABLE_IDEMPOTENCE_CONFIG(true), ACKS_CONFIG(all), RETRIES_CONFIG(Integer.MAX_VALUE)
+        /* For safe producer configs (Kafka <= 2.8) we need to set: ENABLE_IDEMPOTENCE_CONFIG(true), ACKS_CONFIG(all), RETRIES_CONFIG(Integer.MAX_VALUE)
+           In Kafka > 2.8 we don't need because those options are default.
+         */
 
         // Set high throughput producer configs
         properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
         properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024));
+        /*
+            snappy: Producer-side compression strategy. It's efficient when we batch messages together (high throughput).
+            See more: https://www.conduktor.io/kafka/kafka-message-compression
+         */
         properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
 
         // Create producer

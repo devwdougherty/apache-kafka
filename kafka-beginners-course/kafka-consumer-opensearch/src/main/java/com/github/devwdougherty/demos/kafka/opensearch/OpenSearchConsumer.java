@@ -34,8 +34,9 @@ import java.util.Properties;
 public class OpenSearchConsumer {
 
     public static RestHighLevelClient createOpenSearchClient() {
+
         String connString = "http://localhost:9200";
-        //String connString = "https://c9p5mwld41:45zeygn9hy@kafka-course-2322630105.eu-west-1.bonsaisearch.net:443";
+        // String connString = "https://c9p5mwld41:45zeygn9hy@kafka-course-2322630105.eu-west-1.bonsaisearch.net:443";
 
         // we build a URI from the connection string
         RestHighLevelClient restHighLevelClient;
@@ -100,8 +101,9 @@ public class OpenSearchConsumer {
 
         Logger log = LoggerFactory.getLogger(OpenSearchConsumer.class.getSimpleName());
 
-        // We need to create the index on OpenSearch if it doesn't exist already
         try {
+
+            // We need to create the index on OpenSearch if it doesn't exist already
             boolean indexExist = openSearchClient.indices().exists(new GetIndexRequest("wikimedia"), RequestOptions.DEFAULT);
 
             if(!indexExist) {
@@ -115,6 +117,7 @@ public class OpenSearchConsumer {
             // Here we subscribe the consumer
             consumer.subscribe(Collections.singleton("wikimedia.recentchanges"));
 
+            // main logic code
             while(true) {
 
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
@@ -143,7 +146,7 @@ public class OpenSearchConsumer {
 
                         bulkRequest.add(indexRequest);
                     } catch(Exception e) {
-
+                        e.printStackTrace();
                     }
                 }
 
@@ -161,8 +164,6 @@ public class OpenSearchConsumer {
         } catch (Exception e) {
             log.error("Exception: {}", e.getMessage());
         }
-
-        // Main code logic
 
         // Close things
         openSearchClient.close();
